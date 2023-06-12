@@ -1,4 +1,3 @@
-
 from datetime import datetime
 
 
@@ -51,17 +50,19 @@ class Acc_holder(User):
             self.record_transaction("Transfer", amount)
             recipient.record_transaction("Received", amount)
             print(f"Successfully transferred {amount} to {recipient.name}.")
+            return True
         else:
             print("Insufficient balance. Please refill your account.")
+        return False
 
     def take_loan(self, amount, bank):
         if bank.get_loan_application_status():
-            if self.loaned == 0 and amount <= 2 * self.balance:
+            if self.loaned == 0 and amount <= self.balance:
                 self.loaned = amount
                 self.record_transaction("Loan", amount)
-                print(f"{amount} added to your account as a loan successfully")
+                print(f"{amount} added to your account as a loan successfully.")
             else:
-                print(f"You can't request a loan  {2 * self.balance}")
+                print(f"You can't request a loan of {amount}.")
         else:
             print(f"Dear {self.name}, loan applications are not being accepted.")
 
@@ -74,7 +75,7 @@ class Acc_holder(User):
         self.transaction_history.append(transaction)
 
     def see_transaction_history(self):
-        print(f"Hello {self.name},\nYour transaction details are:\n")
+        print(f"Hello {self.name},Your are transaction details:\n")
         for transaction in self.transaction_history:
             tr = f"- Type: {transaction['type']}, Amount: {transaction['amount']}, Time: {transaction['time']}"
             print(tr)
@@ -90,18 +91,6 @@ class Admin(User):
         super().__init__(name, email)
         self.password = password
 
-    def bank_create_new_account(self, account, bank):
-        bank.create_new_account(account)
-
-    def total_bank_balance(self, bank):
-        return bank.total_bank_balance()
-
-    def total_loan(self, bank):
-        return bank.total_loan_given()
-
-    def bank_toggle_loan_on_off(self, bank, password):
-        bank.toggle_loan_on_off(password)
-
 
 class Bank:
     acc_number_start = 1100
@@ -112,11 +101,11 @@ class Bank:
         self.accounts = {}
         self.admins = {}
 
-    def create_new_account(self, account):
-        account_number = self.generate_acc_no()
+    def create_account(self, account):
+        account_number = self._generate_acc_no()
         self.accounts[account_number] = account
 
-    def generate_acc_no(self):
+    def _generate_acc_no(self):
         self.acc_number_start += 1
         return self.acc_number_start
 
@@ -164,10 +153,10 @@ jweal = Acc_holder("jweal khan", "jweal22@.com", "bhola ", 600)
 nazim = Acc_holder("nazim khan", "nazim22@.com", "Bhola", 500)
 nazma = Acc_holder("nazma begum", "nazma34@.com", "Dhaka", 400)
 zakia = Acc_holder('zakia kahn', 'zakia56@.com', 'barisal', 750)
-aulad_22.create_new_account(jweal)
-aulad_22.create_new_account(nazim)
-aulad_22.create_new_account(nazma)
-aulad_22.create_new_account(zakia)
+aulad_22.create_account(jweal)
+aulad_22.create_account(nazim)
+aulad_22.create_account(nazma)
+aulad_22.create_account(zakia)
 jweal.deposit(5000)
 jweal.check_balance()
 jweal.transfer_balance(500, nazim)
@@ -182,4 +171,5 @@ password = "password"
 admin = Admin("admin", "adminkuja@.com", password)
 aulad_22.admins[password] = admin
 aulad_22.toggle_loan_on_off(password)
-nazim.take_loan(1500, aulad_22)
+nazim.take_loan(1000, aulad_22)
+#nazma.take_loan(2500,aulad_22)
